@@ -15,7 +15,6 @@ import java.util.Stack;
  * @author Lenovo T480
  */
 public class Profundidad {
-
     public void busquedaProfundidad(char[][] mapa, int filaInicial, int columnaInicial, int filaFinal, int columnaFinal) {
         Stack<Integer[]> pila = new Stack<>();
         boolean[][] visitado = new boolean[mapa.length][mapa[0].length];
@@ -40,8 +39,6 @@ public class Profundidad {
                 break;
             }
 
-            List<Integer[]> posiblesMovimientos = new ArrayList<>();
-
             for (int i = -1; i <= 1; i++) {
                 for (int j = -1; j <= 1; j++) {
                     if (i != 0 && j != 0) {
@@ -59,58 +56,42 @@ public class Profundidad {
                         continue;
                     }
 
-                    int distancia = 'Z' - mapa[nuevaFila][nuevaColumna]; // Calcula la distancia a la letra "Z"
+                    pila.push(new Integer[]{nuevaFila, nuevaColumna});
+                    padreFila[nuevaFila][nuevaColumna] = filaActual;
+                    padreColumna[nuevaFila][nuevaColumna] = columnaActual;
 
-                    posiblesMovimientos.add(new Integer[]{nuevaFila, nuevaColumna, distancia});
+                    // Imprimir el número de iteración y la posición visitada
+                    System.out.println("Iteración " + contador + ": (" + nuevaFila + ", " + nuevaColumna + ")");
+                    contador++;
                 }
-            }
-
-            // Ordena la lista de posibles movimientos por la distancia de forma descendente
-            posiblesMovimientos.sort((a, b) -> b[2] - a[2]);
-
-            for (Integer[] movimiento : posiblesMovimientos) {
-                int nuevaFila = movimiento[0];
-                int nuevaColumna = movimiento[1];
-
-                pila.push(new Integer[]{nuevaFila, nuevaColumna});
-                padreFila[nuevaFila][nuevaColumna] = filaActual;
-                padreColumna[nuevaFila][nuevaColumna] = columnaActual;
-
-                // Imprimir el número de iteración y la posición visitada
-                System.out.println("Iteración " + contador + ": Visitando posición (" + nuevaFila + ", " + nuevaColumna + ")");
-                contador++;
             }
         }
 
         if (!visitado[filaFinal][columnaFinal]) {
-            System.out.println("No se encontró camino.");
+            System.out.println("No se encontró un camino desde el punto inicial al punto final.");
         } else {
+            System.out.println("Camino encontrado:");
             List<Integer[]> camino = new ArrayList<>();
-            int fila = filaFinal;
-            int columna = columnaFinal;
-
-            while (fila != filaInicial || columna != columnaInicial) {
-                camino.add(new Integer[]{fila, columna});
-                int filaPadre = padreFila[fila][columna];
-                int columnaPadre = padreColumna[fila][columna];
-                fila = filaPadre;
-                columna = columnaPadre;
+            Integer[] actual = new Integer[]{filaFinal, columnaFinal};
+            while (actual[0] != filaInicial || actual[1] != columnaInicial) {
+                camino.add(actual);
+                int filaPadre = padreFila[actual[0]][actual[1]];
+                int columnaPadre = padreColumna[actual[0]][actual[1]];
+                actual = new Integer[]{filaPadre, columnaPadre};
             }
-
-            camino.add(new Integer[]{filaInicial, columnaInicial});
+            camino.add(actual);
             Collections.reverse(camino);
-
-            System.out.println("El camino encontrado es:");
             for (Integer[] posicion : camino) {
                 System.out.println("(" + posicion[0] + ", " + posicion[1] + ")");
             }
+            
             camino.add(new Integer[]{filaInicial, columnaInicial});
             Collections.reverse(camino);
 
             for (int i = 0; i < camino.size(); i++) {
                 Integer[] posicion = camino.get(i);
-                fila = posicion[0];
-                columna = posicion[1];
+                int fila = posicion[0];
+                int columna = posicion[1];
                 mapa[fila][columna] = '+';
             }
 
